@@ -30,33 +30,19 @@ def reg_error(v):
     return True
 
 def label_error(v):
-    if v[-1] not in label_dict:
-        return False
-    if v[-1] in var_dict and v[-1] in label_dict:
-        return False
     return True
 
 def size_error(v):           
-    if v[0] in opcode and ':' not in v[0] and v[0] != "var":
-        if len(v) != ins_size[v[0]]:
-            return False
     return True
 
 def flag_error(v):
     return True
 
-def error(v,opcode,label):
     if(opcode == 1 and not syntax_error(v)):
         out.write(str("Opcode Not Found, " + "Line " + i + "\n"))
         return False
     if(not reg_error(v)):
         out.write(str("Register not found, Line " + i + "\n"))
-        return False
-    if(label == 1 and not label_error(v)):
-        out.write(str("Label Not Found, "+ "Line " + i + "\n"))
-        return False
-    if(not size_error(v)):
-        out.write(str("Instruction Size Limit Error, Line " + i + "\n" ))
         return False
     return True
 
@@ -215,6 +201,7 @@ if line > 129:
     exit()
 
 for i in l:
+
     label_info = 0
     var_info = 0
     opcode_info = 1
@@ -225,7 +212,7 @@ for i in l:
         label_info = 1
     if v[0] == 'ld' or v[0] == 'st':
         var_info = 1
-    b = error(v,opcode_info,line,label_info)
+
     if(not b):
         flag = 1
     line += 1
