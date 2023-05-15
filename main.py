@@ -38,7 +38,6 @@ def size_error(v):
 def flag_error(v):
     return True
 
-def error(v):
     if(opcode == 1 and not syntax_error(v)):
         out.write(str("Opcode Not Found, " + "Line " + i + "\n"))
         return False
@@ -202,8 +201,7 @@ if line > 129:
     exit()
 
 for i in l:
-    over = 1
-    flags = 0
+
     label_info = 0
     var_info = 0
     opcode_info = 1
@@ -214,10 +212,7 @@ for i in l:
         label_info = 1
     if v[0] == 'ld' or v[0] == 'st':
         var_info = 1
-    if v[-1] == "FLAGS":
-        over = 0
-        # print(line,over)
-    b = error(v,opcode_info,line,label_info,var_info,over)
+
     if(not b):
         flag = 1
     line += 1
