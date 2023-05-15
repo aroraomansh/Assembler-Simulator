@@ -20,10 +20,10 @@ def syntax_error(v):
 
 def var_error(v):
     if v[-1] not in var_dict:
-        return False
+        return -1
     if v[-1] in var_dict and v[-1] in label_dict:
-        return False
-    return True
+        return -2
+    return 1
 
 def reg_error(v):
     if v[0] == "mov":
@@ -42,10 +42,10 @@ def reg_error(v):
 
 def label_error(v):
     if v[-1] not in label_dict:
-        return False
+        return -1
     if v[-1] in var_dict and v[-1] in label_dict:
-        return False
-    return True
+        return -2
+    return 1
 
 def size_error(v):           
     if v[0] in opcode and ':' not in v[0] and v[0] != "var":
@@ -80,12 +80,20 @@ def error(v,opcode,line,label,var,over):
     if(not size_error(v)):
         out.write(str("Instruction Size Limit Error, Line " + i + "\n" ))
         return False
-    if(var == 1 and not var_error(v)):
-        out.write(str("Variable Not Found, "+ "Line " + i + "\n"))
-        return False
-    if(label == 1 and not label_error(v)):
-        out.write(str("Label Not Found, "+ "Line " + i + "\n"))
-        return False
+    if(var == 1):
+        if(var_error(v) == -1):
+            out.write(str("Variable Not Found, "+ "Line " + i + "\n"))
+            return False
+        elif(var_error(v) == -2):
+            out.write("Label and Variable cannot have the same identifier, " + "Line " + i + "\n")
+            return False
+    if(label == 1):
+        if(label_error(v) == -1):
+            out.write(str("Label Not Found, "+ "Line " + i + "\n"))
+            return False
+        elif(label_error(v) == -2):
+            out.write("Label and Variable cannot have the same identifier, " + "Line " + i + "\n")
+            return False
     if(not flag_error(v)):
         out.write(str("Illegal use of FLAGS register, "+ "Line " + i + "\n"))
         return False
@@ -235,9 +243,13 @@ line = 1
 
 for i in l:
     v = i.split()
-    if v[0] == "var" and line >= check_var(l):
-        out.write("All variables not declared in the beginning of the program\n")
-        exit()
+    if v[0] == "var":
+        if(len(v) == 1):
+            out.write("Variable not declared, Line " + str(line) + "\n")
+            exit()
+        if(line >= check_var(l)):
+            out.write("All variables not declared in the beginning of the program, Line " + str(line) + "\n")
+            exit()
     line += 1
 
 if check_halt(l) == -1:
@@ -254,19 +266,28 @@ for i in l:
     i = i.strip()
     v = i.split()
     if v[0] == 'var':
-        var_dict[v[-1]] = var_dec()
-        var_num += 1
+        if v[-1] not in var_dict:
+            var_dict[v[-1]] = var_dec()
+            var_num += 1
+        else:
+            out.write("Redeclaration of variable, Line " + str(line) + "\n")
+            exit()
+
     for j in v:
         if ':' in j:
             j = j.replace(":","")
-            label_dict[j] = label_dec()
-            label_num -= 1
+            if j not in label_dict:
+                label_dict[j] = label_dec()
+                label_num -= 1
+            else:
+                out.write("Label already exists, Line " + str(line) + "\n")
+                exit()
     line += 1
 
 # Check size of program
 if line > 129:
     out.write("Program cannot contain more than 128 lines\n")
-    # exit()
+    exit()
 
 # Check for additional errors
 line = 1
@@ -304,7 +325,6 @@ if(flag == 0):
             gen_reg(v)
         elif(v[0] == 'hlt'):
             hlt()
-
         elif(v[0] == "st"):
             st(v)
         elif(v[0] == "ld"):
