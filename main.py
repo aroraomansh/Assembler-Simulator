@@ -17,9 +17,16 @@ def syntax_error(v):
     return True
 
 def var_error(v):
+    if v[-1] not in var_dict:
+        return False
+    if v[-1] in var_dict and v[-1] in label_dict:
+        return False
     return True
 
 def reg_error(v):
+    for i in v:
+        if 'R' in i and i not in reg:
+            return False
     return True
 
 def label_error(v):
@@ -32,9 +39,13 @@ def flag_error(v):
     return True
 
 def error(v):
-    if(syntax_error(v) and var_error(v) and reg_error(v) and label_error(v) and size_error(v)):
-        return True
-    return False
+    if(opcode == 1 and not syntax_error(v)):
+        out.write(str("Opcode Not Found, " + "Line " + i + "\n"))
+        return False
+    if(not reg_error(v)):
+        out.write(str("Register not found, Line " + i + "\n"))
+        return False
+    return True
 
 def bitcon(s):
     if(len(s) < 7):
@@ -149,14 +160,6 @@ def check_halt(l):
         line += 1
     return -2
 
-def jlt(s):
-    temp = bin(label_num)
-    label_dict[s[1]] = temp[2:]
-    out.write(opcode['jlt'])
-    out.write(unused['jlt'])
-    out.write(label_dict[s[1]])
-    out.write("\n")   
-    
 with open ("input.txt") as f:
     l = f.readlines()
     
@@ -173,6 +176,13 @@ line = 1
 
 for i in l:
     v = i.split()
+    if v[0] == "var" and line >= check_var(l):
+        out.write("Please Declare all variables at the beginning of the program\n")
+        # exit()
+    line += 1
+
+# Identify variables and labels
+line = 1
 for i in l:
     i = i.strip()
     v = i.split()
@@ -185,6 +195,11 @@ for i in l:
             label_dict[j] = label_dec()
             label_num -= 1
     line += 1
+    
+# Check size of program
+if line > 129:
+    out.write("Program cannot contain more than 128 lines\n")
+    exit()
 
 for i in l:
     over = 1
@@ -229,6 +244,4 @@ if(flag == 0):
             jgt(v)
         elif (v[0] == 'jmp'):
             jmp(v)
-        elif(v[0] == 'jlt'):
-             jlt(v)
 out.close()
