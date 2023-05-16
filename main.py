@@ -1,3 +1,4 @@
+import sys
 # mov0: $
 # mov1 : Reg
 opcode = {'add': '00000', 'sub': '00001', 'mov': ['00010', '00011'], 'ld': '00100', 'st': '00101', 'mul': '00110', 'div': '00111', 'rs': '01000', 'ls': '01001', 'xor': '01010', 'or': '01011', 'and': '01100', 'not': '01101', 'cmp': '01110', 'jmp': '01111', 'jlt': '11100', 'jgt': '11101', 'je': '11111', 'hlt': '11010', 'addf': '10000', 'subf': '10001',"var": ""}
@@ -8,10 +9,6 @@ reg_ins = {'add': [1, 2, 3], 'sub': [1, 2, 3], 'and': [1, 2, 3], 'ld': [1], 'st'
 line_factors = {}
 var_dict = {}
 label_dict = {}
-var_num = 1
-label_num = 125
-
-out = open("output.txt",'w')
 
 def syntax_error(v):
     if v[0] not in opcode.keys():
@@ -72,33 +69,35 @@ def overflow_error(v):
 def error(v,opcode,line,label,var,over):
     i = str(line)
     if(opcode == 1 and not syntax_error(v)):
-        out.write(str("Opcode Not Found, " + "Line " + i + "\n"))
+        print(str("Opcode Not Found, " + "Line " + i))
         return False
     if(not reg_error(v)):
-        out.write(str("Register not found, Line " + i + "\n"))
+        print(str("Register not found, Line " + i))
         return False
     if(not size_error(v)):
-        out.write(str("Instruction Size Limit Error, Line " + i + "\n" ))
+        print(str("Instruction Size Limit Error, Line " + i))
         return False
     if(var == 1):
         if(var_error(v) == -1):
-            out.write(str("Variable Not Found, "+ "Line " + i + "\n"))
+            print(str("Variable Not Found, "+ "Line " + i))
             return False
         elif(var_error(v) == -2):
-            out.write("Label and Variable cannot have the same identifier, " + "Line " + i + "\n")
+            print("Label and Variable cannot have the same identifier, " + "Line " + i)
             return False
     if(label == 1):
         if(label_error(v) == -1):
-            out.write(str("Label Not Found, "+ "Line " + i + "\n"))
+            print(str("Label Not Found, "+ "Line " + i))
             return False
         elif(label_error(v) == -2):
-            out.write("Label and Variable cannot have the same identifier, " + "Line " + i + "\n")
+            print("Label and Variable cannot have the same identifier, " + "Line " + i)
             return False
     if(not flag_error(v)):
-        out.write(str("Illegal use of FLAGS register, "+ "Line " + i + "\n"))
+        print(str("Illegal use of FLAGS register, "+ "Line " + i))
+        
         return False
     if(over == 1 and not overflow_error(v)):
-        out.write(str("Value exceeding limit 0 - 127, Line " + i + "\n"))
+        print(str("Value exceeding limit 0 - 127, Line " + i))
+        
         return False
     return True
 
@@ -108,11 +107,25 @@ def bitcon(s):
             s = '0' + s
     return s
 
-def label_dec():
+def label_bit(a):
+    s = bin(int(a))[2::]
+    if(len(s) < 7):
+        for i in range(7-len(s)):
+            s ='0' + s
+    return s
+
+def label_dec(label_num):
     a = bitcon(bin(label_num)[2::])
     return a
 
-def var_dec():
+def var_bit(a):
+    s = bin(int(a))[2::]
+    if(len(s) < 7):
+        for i in range(7-len(s)):
+            s ='0' + s
+    return s
+
+def var_dec(var_num):
     a = bitcon(bin(var_num)[2::])
     return a
 
@@ -121,79 +134,75 @@ def var(s):
     var_dict[s] = var_dec()
     
 def imm(s):
-    out.write(opcode[s[0]])
-    out.write(reg[s[1]])
-    out.write(bitcon(bin(int(v[2][1::]))[2::]))
-    out.write('\n')
+    print(opcode[s[0]],end = "")
+    print(reg[s[1]],end = "")
+    print(bitcon(bin(int(v[2][1::]))[2::]))
 
 def mov(s):
     if "$" in s:
-        out.write(opcode["mov"][0])
-        out.write(unused["mov"][0])
-        out.write(reg[v[1]])
-        out.write(bitcon(bin(int(v[2][1::]))[2::]))
+        print(opcode["mov"][0],end = "")
+        print(unused["mov"][0],end = "")
+        print(reg[v[1]],end = "")
+        print(bitcon(bin(int(v[2][1::]))[2::]))
     else:
-        out.write(opcode["mov"][1])
-        out.write(unused["mov"][1])
-        out.write(reg[v[1]])
-        out.write(reg[v[2]])
-    out.write('\n')
+        print(opcode["mov"][1],end = "")
+        print(unused["mov"][1],end = "")
+        print(reg[v[1]],end = "")
+        print(reg[v[2]],end = "")
+        print()
 
 def gen_reg(s):
-    out.write(opcode[v[0]])
-    out.write(unused[v[0]])
-    out.write(reg[s[1]])
-    out.write(reg[s[2]])
-    out.write(reg[s[3]])
-    out.write('\n')
+    print(opcode[v[0]],end = "")
+    print(unused[v[0]],end = "")
+    print(reg[s[1]],end = "")
+    print(reg[s[2]],end = "")
+    print(reg[s[3]],end = "")
+    print()
 
 
 def hlt():
-    out.write(opcode['hlt'])
-    out.write(unused['hlt'])
-    out.write('\n')
+    print(opcode['hlt'],end = "")
+    print(unused['hlt'],end = "")
+    print()
 
 def st(s):
-    out.write(opcode['st'])
-    out.write(unused['st'])
-    out.write(reg[s[1]])
-    out.write(var_dict[s[2]])
-    out.write('\n')
+    print(opcode['st'],end = "")
+    print(unused['st'],end = "")
+    print(reg[s[1]],end = "")
+    print(var_dict[s[2]],end = "")
+    print()
 
 def ld(s):
-    out.write(opcode['ld'])
-    out.write(unused['ld'])
-    out.write(reg[s[1]])
-    out.write(var_dict[s[2]])
-    out.write('\n')
+    print(opcode['ld'],end = "")
+    print(unused['ld'],end = "")
+    print(reg[s[1]],end = "")
+    print(var_dict[s[2]],end = "")
+    print()
 
 def gen(s):
-    out.write(opcode[s[0]])
-    out.write(unused[s[0]])
-    out.write(reg[s[1]])
-    out.write(reg[s[2]]) 
-    out.write('\n')
+    print(opcode[s[0]],end = "")
+    print(unused[s[0]],end = "")
+    print(reg[s[1]],end = "")
+    print(reg[s[2]],end = "") 
+    print()
 
 def jgt(s):
-    temp=bin(label_num)
-    out.write(opcode["jgt"])
-    out.write(unused["jgt"])
-    out.write(label_dict[s[1]])
-    out.write("\n")
+    print(opcode["jgt"],end = "")
+    print(unused["jgt"],end = "")
+    print(label_dict[s[1]],end = "")
+    print()
 
 def jlt(s):
-    temp = bin(label_num)
-    out.write(opcode['jlt'])
-    out.write(unused['jlt'])
-    out.write(label_dict[s[1]])
-    out.write("\n")
+    print(opcode['jlt'],end = "")
+    print(unused['jlt'],end = "")
+    print(label_dict[s[1]],end = "")
+    print()
 
 def jmp(s):
-    temp=bin(label_num)
-    out.write(opcode["jmp"])
-    out.write(unused["jmp"])
-    out.write(label_dict[s[1]])
-    out.write("\n")
+    print(opcode["jmp"],end = "")
+    print(unused["jmp"],end = "")
+    print(label_dict[s[1]],end = "")
+    print()
 
 def check_var(l):
     line = 1
@@ -202,6 +211,11 @@ def check_var(l):
         if v[0] != "var":
             return line
         line += 1
+        
+def je(s): 
+    print(opcode['je'],end = "")
+    print(unused['je'],end = "")
+    print(bitcon(bin(int(label_dict[s[1]]))[2::]))
         
 def check_halt(l):
     line = 1
@@ -214,10 +228,48 @@ def check_halt(l):
         line += 1
     return -2
 
-with open ("input.txt") as f:
-    l = f.readlines()
+l = []
+
+# f = open("input.txt",'r')
+# for i in f:
+#     l.append(i)
+
+for i in sys.stdin:
+    l.append(i)
 
 l.append('lstend')
+
+# Identify variables and labels
+if check_var(l) != 1:
+    line = -check_var(l) + 1
+else:
+    line = 0
+for i in l:
+    i = i.strip()
+    v = i.split()
+    for j in v:
+        if ':' in j:
+            j = j.replace(":","")
+            if j not in label_dict:
+                label_dict[j] = label_bit(str(line))
+
+            else:
+                print("Label already exists, Line " + str(line))
+                exit()
+    line += 1
+
+prglen = len(l) - check_var(l)
+for i in l:
+    i = i.strip()
+    v = i.split()
+    if v[0] == 'var':
+        if v[-1] not in var_dict:
+            var_dict[v[-1]] = bitcon(bin(prglen)[2::])
+        else:
+            print("Redeclaration of variable, Line " + str(line))
+            exit()
+    prglen += 1
+    
 i = 0
 while True:
     if(l[i] == "lstend"):
@@ -228,7 +280,7 @@ while True:
         if(not b.isspace()):
             l.insert(i+1,b)
             line_factors[i+1] = 1
-    i +=1 
+    i +=1
 
 l.pop()
 
@@ -245,48 +297,25 @@ for i in l:
     v = i.split()
     if v[0] == "var":
         if(len(v) == 1):
-            out.write("Variable not declared, Line " + str(line) + "\n")
+            print("Variable not declared, Line " + str(line))
             exit()
         if(line >= check_var(l)):
-            out.write("All variables not declared in the beginning of the program, Line " + str(line) + "\n")
+            print("All variables not declared in the beginning of the program, Line " + str(line))
             exit()
     line += 1
 
 if check_halt(l) == -1:
-    out.write("Halt instruction not present at the end of the program\n")
+    print("Halt instruction not present at the end of the program")
     exit()
     
 if check_halt(l) == -2:
-    out.write("Halt instruction not found\n")
+    print("Halt instruction not found")
     exit()
 
-# Identify variables and labels
-line = 1
-for i in l:
-    i = i.strip()
-    v = i.split()
-    if v[0] == 'var':
-        if v[-1] not in var_dict:
-            var_dict[v[-1]] = var_dec()
-            var_num += 1
-        else:
-            out.write("Redeclaration of variable, Line " + str(line) + "\n")
-            exit()
-
-    for j in v:
-        if ':' in j:
-            j = j.replace(":","")
-            if j not in label_dict:
-                label_dict[j] = label_dec()
-                label_num -= 1
-            else:
-                out.write("Label already exists, Line " + str(line) + "\n")
-                exit()
-    line += 1
 
 # Check size of program
 if line > 129:
-    out.write("Program cannot contain more than 128 lines\n")
+    print("Program cannot contain more than 128 lines")
     exit()
 
 # Check for additional errors
@@ -308,7 +337,7 @@ for i in l:
         over = 0
     b = error(v,opcode_info,line,label_info,var_info,over)
     if(not b):
-        # out.write("error at",line)
+        # print("error at",line)
         flag = 1
         # break
     if line in line_factors and line_factors[line] == 1:
@@ -319,6 +348,7 @@ for i in l:
 if(flag == 0):
     for i in l:
         v = i.split()
+        # print(i)
         if(v[0] == "mov"):
             mov(v[-1])
         elif(v[0] == 'add' or v[0] == 'sub' or v[0] == "mul" or v[0] == "and" or v[0] == "or" or v[0] == "xor"):
@@ -337,4 +367,6 @@ if(flag == 0):
             jgt(v)
         elif (v[0] == 'jmp'):
             jmp(v)
-out.close()
+        elif (v[0] == 'je'):
+            je(v)
+        
