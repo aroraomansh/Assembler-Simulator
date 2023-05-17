@@ -69,7 +69,7 @@ def overflow_error(v):
 def error(v,opcode,line,label,var,over):
     i = str(line)
     if(opcode == 1 and not syntax_error(v)):
-        print(str("Opcode Not Found, " + "Line " + i))
+        print(str("Instruction " + v[0] + " Not Found, " + "Line " + i))
         return False
     if(not reg_error(v)):
         print(str("Register not found, Line " + i))
@@ -79,14 +79,14 @@ def error(v,opcode,line,label,var,over):
         return False
     if(var == 1):
         if(var_error(v) == -1):
-            print(str("Variable Not Found, "+ "Line " + i))
+            print(str("Variable " + v[-1] + " Not Found, "+ "Line " + i))
             return False
         elif(var_error(v) == -2):
             print("Label and Variable cannot have the same identifier, " + "Line " + i)
             return False
     if(label == 1):
         if(label_error(v) == -1):
-            print(str("Label Not Found, "+ "Line " + i))
+            print(str("Label " + v[-1] + " Not Found, "+ "Line " + i))
             return False
         elif(label_error(v) == -2):
             print("Label and Variable cannot have the same identifier, " + "Line " + i)
@@ -369,4 +369,4 @@ if(flag == 0):
             jmp(v)
         elif (v[0] == 'je'):
             je(v)
-        
+       
