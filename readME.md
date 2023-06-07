@@ -76,10 +76,14 @@ assembler is a text file containing the assembly instructions. Each line of the 
 one of 3 types:
 
 ● Empty line: Ignore these lines
+
 ● A label
+
 ● An instruction
+
 ● A variable definition
 Each of these entities have the following grammar:
+
 ● The syntax of all the supported instructions is given above. The fields of an instruction
 are whitespace separated. The instruction itself might also have whitespace before it. An
 instruction can be one of the following:
