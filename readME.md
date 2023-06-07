@@ -15,10 +15,10 @@ Short description or overview of the project.
 
 ## Introduction
 
-Assignment
+### Assignment
 
-###CSE 112 Computer Organization
-####Introduction and Instructions
+### CSE 112 Computer Organization
+#### Introduction and Instructions
 
 ● This will be a group assignment, each student in the group will be marked separately.
 Therefore try to make sure that work is roughly divided equally among all the members
@@ -216,3 +216,5 @@ Pranav Bharadwaj 2022363,
 Omansh Arora     2022342,
 Naman Singh      2022312,
 Nishant Kumar    2022326.
+  
+## Thanks for your giving your time 
