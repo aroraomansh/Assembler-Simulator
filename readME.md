@@ -11,7 +11,7 @@ Extending the functionality of the assembler-simulator set-up to handle simple f
 - [Project Title](#project-title)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
-  - [Question Description](#question description)
+  - [Description](#description)
   - [Deadlines](#deadlines)
   - [Instructions](#instructions)
   - [Screenshots](#screenshots)
@@ -58,7 +58,7 @@ system failures or any other issues. In case of system failures of all the membe
 group, your last committed code on github before the deadline will be considered for
 evaluation.
 
-## Question Description
+## Description
 
 There are a total of four questions in this assignment:
 1. Designing and Implementing the assembler.
@@ -242,9 +242,9 @@ command.
 
 ## Contribution
 Efforts by group B31:
-Pranav Bharadwaj 2022363,
-Omansh Arora     2022342,
-Naman Singh      2022312,
-Nishant Kumar    2022326.
+  Pranav Bharadwaj 2022363,
+  Omansh Arora     2022342,
+  Naman Singh      2022312,
+  Nishant Kumar    2022326.
   
-## Thanks for your giving your time 
+## Thanks for your attention
