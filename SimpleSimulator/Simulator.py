@@ -11,6 +11,7 @@ Type_D = {"store":"00101","load":"00100"}
 Type_E = ["01111","11100","11101","11111"]
 vars = {}
 PC = 0
+flag_temp = "N"
 
 def overflow(n):
     if n > 65536:
@@ -34,16 +35,13 @@ def not_op(n):
     return int(ans,2)
 
 def add(n):
-    reg1_code = n[10:13]
-    reg2_code = n[13:]
-    l = list(reg_codes.values())
-    if reg1_code in l and reg2_code in l:
-        reg1 = [k for k, v in reg_codes.items() if v == reg1_code][0]
-        reg2 = [k for k, v in reg_codes.items() if v == reg2_code][0]
-        reg[reg1] = reg[reg1] + reg[reg2]
-        if(overflow(reg[reg1])):
-            reg[reg1] = 0
-            reg["FLAGS"] = 'V'
+    reg1 = reg_codes_rev[n[7:10]]
+    reg2 = reg_codes_rev[n[10:13]]
+    reg3 = reg_codes_rev[n[13:]]
+    reg[reg1] = reg[reg3] + reg[reg2]
+    if(overflow(reg[reg1])):
+        reg[reg1] = 0
+        reg["FLAGS"] = 'V'
 
 def sub(n): 
     reg1_code = n[10:13]
@@ -97,27 +95,87 @@ def and_(n):
         reg[reg1] = reg[reg1] & reg[reg2]
 
 def jmp(s):
-    val = s[-7:]
     global PC
-    PC = int(val,2)
+    print(bitcon(PC,7),end = "        ")
+    for i in reg.values():
+        if i == 'V':
+            print("0000000000001000")
+        elif i == 'L':
+            print("0000000000000100")
+        elif i == 'G':
+            print("0000000000000010")
+        elif i == 'E':
+            print("0000000000000001")
+        elif i == "N":
+            print("0000000000000000")
+        else:
+            print(bitcon(i,16),end = " ")
+    val = s[-7:]
+    PC = int(val,2)-1
+    # print(bin(PC)[2:],end = " ")
 
 def jlt(s):
-    if reg["FLAGS"] == 'L':
+    global PC
+    for i in reg.values():
+        if i == 'V':
+            print("0000000000001000")
+        elif i == 'L':
+            print("0000000000000100")
+        elif i == 'G':
+            print("0000000000000010")
+        elif i == 'E':
+            print("0000000000000001")
+        elif i == "N":
+            print("0000000000000000")
+        else:
+            print(bitcon(i,16),end = " ")
+    if flag_temp == 'L':
         val = s[-7:]
-        global PC
-        PC = int(val,2)
+        PC = int(val,2)-1
+    # print(bin(PC)[2:],end = " ")
 
 def jgt(s):
-    if reg["FLAGS"] == 'G':
+    global PC
+    print(bitcon(PC,7),end = "        ")
+    for i in reg.values():
+        if i == 'V':
+            print("0000000000001000")
+        elif i == 'L':
+            print("0000000000000100")
+        elif i == 'G':
+            print("0000000000000010")
+        elif i == 'E':
+            print("0000000000000001")
+        elif i == "N":
+            print("0000000000000000")
+        else:
+            print(bitcon(i,16),end = " ")
+    if flag_temp == 'G':
         val = s[-7:]
-        global PC
-        PC = int(val,2)
+        PC = int(val,2)-1
+    # print(bin(PC)[2:],end = " ")
 
 def je(s):
-    if reg["FLAGS"] == 'E':
+    global PC
+    print(bitcon(PC,7),end = "        ")
+    # print(bin(PC)[2:],end = " ")
+    for i in reg.values():
+        if i == 'V':
+            print("0000000000001000")
+        elif i == 'L':
+            print("0000000000000100")
+        elif i == 'G':
+            print("0000000000000010")
+        elif i == 'E':
+            print("0000000000000001")
+        elif i == "N":
+            print("0000000000000000")
+        else:
+            print(bitcon(i,16),end = " ")
+    print(bitcon(PC,7),end = "        ")
+    if flag_temp == 'E':
         val = s[-7:]
-        global PC
-        PC = int(val,2)
+        PC = int(val,2)-1
         
 def mov(n):
     reg1_code = n[10:13]
@@ -126,6 +184,18 @@ def mov(n):
     if reg1_code in l:
         reg1 = [k for k, v in reg_codes.items() if v == reg1_code][0]
         reg2 = [k for k, v in reg_codes.items() if v == reg2_code][0]
+    if reg2 == "FLAGS":
+        if  flag_temp == "V":
+            reg[reg1] = 8
+        elif  flag_temp == "E":
+            reg[reg1] = 1 
+        elif  flag_temp == "L":
+            reg[reg1] = 4
+        elif  flag_temp == "G":
+            reg[reg1] = 2 
+        elif flag_temp == "N":
+            reg[reg1] = 0 
+    else:
         reg[reg1] = reg[reg2]
 
 def div(n):
@@ -185,7 +255,7 @@ def ls(s):
 def load(s):
     reg_id = reg_codes_rev[s[6:9]]
     mem = s[9:]
-    reg[reg_id] = vars[mem] 
+    reg[reg_id] = vars[mem]
 
 def store(s):
     reg_id = reg_codes_rev[s[6:9]]
@@ -221,12 +291,16 @@ def type_C(s):
 # Type E
 def type_E(s):
     if s[0:5] == "01111":
+        # print(PC,"E")
         jmp(s)
     elif s[0:5] == "11100":
+        # print(PC,"E")
         jlt(s)
     elif s[0:5] == "11101":
+        # print(PC,"E")
         jgt(s)
     elif s[0:5] == "11111":
+        # print(PC,"E")
         je(s)
 
 # Type B
@@ -249,31 +323,41 @@ l = []
 for i in sys.stdin:
     l.append(i.strip())
 
+# for i in range(len(l)):
+#     print(i,l[i])
+
 while l[PC][0:5] != "11010":
     # print(i)
+    opcode = l[PC][0:5]
+    type_A(l[PC])
     type_B(l[PC])
     type_C(l[PC])
-    type_E(l[PC])
     type_D(l[PC])
-    print(bitcon(PC,7),end = "        ")
-    # print(bin(PC)[2:],end = " ")
-    for i in reg.values():
-        if i == 'V':
-            print("0000000000001000")
-        elif i == 'L':
-            print("0000000000000100")
-        elif i == 'G':
-            print("0000000000000010")
-        elif i == 'E':
-            print("0000000000000001")
-        elif i == "N":
-            print("0000000000000000")
-        else:
-            print(bitcon(i,16),end = " ")
-    # print(*reg.values())
+    type_E(l[PC])
+    if opcode not in Type_E:
+        print(bitcon(PC,7),end = "        ")
+        for i in reg.values():
+            if i == 'V':
+                print("0000000000001000")
+            elif i == 'L':
+                print("0000000000000100")
+            elif i == 'G':
+                print("0000000000000010")
+            elif i == 'E':
+                print("0000000000000001")
+            elif i == "N":
+                print("0000000000000000")
+            else:
+                print(bitcon(i,16),end = " ")
+        # print(*reg.values())
     PC+= 1
+    flag_temp = reg["FLAGS"]
+    reg['FLAGS'] = "N"
+    if PC >= len(l):
+        break
+# print(PC)
 
-print(bitcon(PC,7),end = " ")
+print(bitcon(PC,7),end = "        ")
 for i in reg.values():
     if i == 'V':
         print("0000000000001000")
@@ -286,7 +370,7 @@ for i in reg.values():
     elif i == "N":
         print("0000000000000000")
     else:
-        print(bitcon(i,16),end = "        ")
+        print(bitcon(i,16),end = " ")
 
 # Memory Dump
 lines = 0
