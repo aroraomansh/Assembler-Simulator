@@ -100,6 +100,7 @@ instruction can be one of the following:
 
 ● A label marks a location in the code and must be followed by a colon (:). No spaces are
 allowed between label name and colon(:)
+
 ● A variable definition is of the following format:
 var xyz
 which declares a 16 bit variable called xyz. This variable name can be used in
@@ -131,24 +132,30 @@ assembler can write less than or equal to 128 lines.
 
 Input/Output format:
 ● The assembler must read the assembly program as an input text file (stdin).
+
 ● The assembler must generate the binary (if there are no errors) as an output text file
 (stdout).
+
 ● The assembler must generate the error notifications along with line number on which the
 error was encountered (if there are errors) as an output text file (stdout). In case of
 multiple errors, the assembler may print any one of the errors.
 Example of an assembly program:
+```
 var X
 mov R1 $10
 mov R2 $100
 mul R3 R2 R1
 st R3 X
 hlt
+```
 The above program will be converted into the following machine code
+```
 0001000100001010
 0001001001100100
 0011000011010001
 0010101100000101
 1101000000000000
+```
 
 Q2: Simulator:
 You need to write a simulator for the given ISA. The input to the simulator is a binary
@@ -158,7 +165,9 @@ executing the code at address 0. The code is executed until hlt is reached. Afte
 each instruction, the simulator should output one line containing an 7 bit number denoting the
 program counter. This should be followed by 8 space separated 16 bit binary numbers
 denoting the values of the registers (R0, R1, … R6 and FLAGS).
+```
 <PC (7 bits)><space><R0 (16 bits)><space>...<R6 (16 bits)><space><FLAGS (16 bits)>.
+```
 The output must be written to stdout. Similarly, the input must be read from stdin. After
 the program is halted, print the memory dump of the whole memory. This should be 128 lines,
 each having a 16 bit value.
@@ -180,6 +189,7 @@ returns the value stored at that register.
 to get the stored instruction from MEM, and executes the instruction by updating the RF
 and PC.
 The simulator should follow roughly the following pseudocode:
+```
 initialize(MEM); // Load memory from stdin
 PC = 0; // Start from the first instruction
 halted = false;
@@ -192,7 +202,7 @@ RF.dump(); // Print RF state
 PC.update(new_PC); // Update PC
 }
 MEM.dump() // Print the complete memory
-
+```
 ## Deadlines
 You will have two deadlines for this assignment:
 
