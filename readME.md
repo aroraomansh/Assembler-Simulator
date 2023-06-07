@@ -7,9 +7,10 @@ Short description or overview of the project.
 - [Project Title](#project-title)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
-  - [Features](#features)
-  - [Installation](#installation)
-  - [Usage](#usage)
+  - [Question Description](#question description)
+  - [Deadlines](#deadlines)
+  - [Instructions](#instructions)
+  - [Screenshots](#screenshots)
   - [Contribution](#contribution)
 
 ## Introduction
